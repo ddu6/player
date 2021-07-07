@@ -15,7 +15,7 @@ export class Player{
         if(src===''){
             return
         }
-        const type=src.endsWith('.flv')?'customFLV':'auto'
+        const type=src.endsWith('.flv')||src.endsWith('.flv.mp4')?'customFLV':'auto'
         const time=Number(params.get('t')??document.body.dataset.t??'')
         this.dp = new DPlayer({
             container: this.element.element,
