@@ -1,0 +1,68 @@
+.root {
+    --color-text: black;
+    --color-light: #6a737d;
+    --color-string: darkorange;
+    --color-number: #098658;
+    --color-keyword: #AF00DB;
+    --color-function: #ecad00;
+    --color-variable: deepskyblue;
+    --color-modifier: dodgerblue;
+    --color-class: #267f99;
+    --color-warn: red;
+    --color-comment: limegreen;
+    --color-border: #e1e4e8;
+    --color-bg: white;
+    --color-area: whitesmoke;
+    --color-pre: #f6f8fa;
+    --color-slice: rgba(211, 211, 211, 0.5);
+    --color-selection: rgba(135, 206, 235, 0.5);
+    --color-span: rgba(27, 31, 35, .05);
+    --font: "Segoe UI", "Microsoft YaHei", "Hiragino Sans GB", "STHeiti Light", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --font-icomoon: icomoon, "Segoe UI", "Microsoft YaHei", "Hiragino Sans GB", "STHeiti Light", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --length-width: calc(210mm - .8in);
+    ;
+    --length-width-side: 336px;
+    --length-width-bar: 15px;
+    --length-tab: 2em;
+    --length-padding: 1em;
+    --length-gap: .5em;
+    --length-padding-span: .3em;
+    --length-space: .25em;
+    --length-padding-circle: .2em;
+    --length-font-title: 1.8em;
+    --length-font-heading: 1.3em;
+    --length-font-span: .85em;
+    --length-font-log: .8em;
+    --length-font-circle: .7em;
+    --number-ratio-line: 1.5;
+}
+.player{
+    position: relative;
+}
+.player>video{
+    display: block;
+    width: 100%;
+}
+.player>.tool-bar{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, var(--color-bg), 75%, transparent);
+    padding: var(--length-gap);
+}
+.player>.tool-bar>div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--length-gap);
+}
+.player>.tool-bar>div>.number-bar{
+    flex-grow: 1;
+}
+.player>.tool-bar>div>.number-bar:not(.time):before {
+    content: attr(data-name);
+    color: var(--color-light);
+    font-size: var(--length-font-log);
+    text-transform: capitalize;
+}
