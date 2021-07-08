@@ -36,11 +36,10 @@ export class Player{
         )
         const params = new URLSearchParams(document.location.search)
         const src=params.get('src')??document.body.dataset.src??''
-        if(src===''){
-            return
+        if(src!==''){
+            this.videoEle.src=src
         }
         const time=Number(params.get('t')??document.body.dataset.t??'')
-        this.videoEle.src=src
         if(time>0){
             this.videoEle.currentTime=time
         }
@@ -53,12 +52,17 @@ export class Player{
         this.bars.brightness.handleInput=async value=>{
             this.videoEle.style.filter=`brightness(${value})`
         }
-        this.checkboxes.play.addEventListener('click',()=>{
+        this.checkboxes.play.addEventListener('click',async ()=>{
+            if(this.checkboxes.play.classList.contains('checking')){
+                return
+            }
+            this.checkboxes.play.classList.add('checking')
             if(this.checkboxes.play.classList.contains('play')){
-                this.videoEle.play()
+                await this.videoEle.play()
             }else{
                 this.videoEle.pause()
             }
+            this.checkboxes.play.classList.remove('checking')
         })
         this.videoEle.addEventListener('loadedmetadata',()=>{
             this.bars.time.setDuration(this.videoEle.duration)
