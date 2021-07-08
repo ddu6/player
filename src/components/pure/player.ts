@@ -34,12 +34,12 @@ export class Player{
                 .append(this.bars.brightness)
             )
         )
-        const params = new URLSearchParams(document.location.search)
-        const src=params.get('src')??document.body.dataset.src??''
+        const params=new URLSearchParams(document.location.search)
+        const src=params.get('src')??parent.dataset.src??''
         if(src!==''){
             this.videoEle.src=src
         }
-        const time=Number(params.get('t')??document.body.dataset.t??'')
+        const time=Number(params.get('t')??parent.dataset.t??'')
         if(time>0){
             this.videoEle.currentTime=time
         }
