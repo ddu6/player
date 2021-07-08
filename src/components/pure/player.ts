@@ -82,6 +82,9 @@ export class Player{
         this.videoEle.addEventListener('timeupdate',()=>{
             this.bars.time.setValue(this.videoEle.currentTime)
         })
+        this.videoEle.addEventListener('ratechange',()=>{
+            this.bars.speed.setValue(this.videoEle.playbackRate)
+        })
         this.videoEle.addEventListener('click',()=>{
             this.toolBar.classList.toggle('hide')
         })

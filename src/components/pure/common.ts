@@ -172,6 +172,9 @@ export class NumberBar extends NamedDiv{
         this.renderBar()
     }
     setValue(value:number){
+        if(this.log){
+            value=Math.log(value)
+        }
         if(value<this.min||!isFinite(value)){
             value=this.min
         }else if(value>this.max){
