@@ -1,10 +1,7 @@
-import { Checkbox, Div, NumberBar, TimeBar } from './common'
-import * as css from '../../lib/css'
-import * as fonts from '../../lib/fonts'
-export class Player{
-    readonly element=new Div(['player'])
+import { Shell, Div, Checkbox, NumberBar, TimeBar } from '@ddu6/stui'
+import {all} from './lib/css'
+export class Player extends Shell{
     readonly videoEle=document.createElement('video')
-    readonly styleEle=document.createElement('style')
     readonly toolBar=new Div(['tool bar'])
     readonly bars={
         time:new TimeBar('time',0),
@@ -14,12 +11,9 @@ export class Player{
     readonly checkboxes={
         play:new Checkbox('play')
     }
-    constructor(public parent:HTMLElement){
-        parent.classList.add('root')
-        this.styleEle.textContent=fonts.fonts+css.common+css.dark+css.player
-        parent.append(this.styleEle)
-        parent.append(this.element.element)
-        this.element
+    constructor(){
+        super('Player','',all,['player'])
+        this
         .append(this.videoEle)
         .append(
             this.toolBar
@@ -35,11 +29,11 @@ export class Player{
             )
         )
         const params=new URLSearchParams(document.location.search)
-        const src=params.get('src')??parent.dataset.src??''
+        const src=params.get('src')??document.body.dataset.src??''
         if(src!==''){
             this.videoEle.src=src
         }
-        const time=Number(params.get('t')??parent.dataset.t??'')
+        const time=Number(params.get('t')??document.body.dataset.t??'')
         if(time>0){
             this.videoEle.currentTime=time
         }
