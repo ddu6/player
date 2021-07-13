@@ -37,15 +37,15 @@ export class Player extends Shell{
         if(time>0){
             this.videoEle.currentTime=time
         }
-        this.bars.time.handleInput=async value=>{
+        this.bars.time.inputListeners.push(async value=>{
             this.videoEle.currentTime=value
-        }
-        this.bars.speed.handleInput=async value=>{
+        })
+        this.bars.speed.inputListeners.push(async value=>{
             this.videoEle.playbackRate=value
-        }
-        this.bars.brightness.handleInput=async value=>{
+        })
+        this.bars.brightness.inputListeners.push(async value=>{
             this.videoEle.style.filter=`brightness(${value})`
-        }
+        })
         this.checkboxes.play.addEventListener('click',async ()=>{
             if(this.checkboxes.play.classList.contains('checking')){
                 return
