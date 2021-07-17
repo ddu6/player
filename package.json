@@ -5,13 +5,13 @@
     "build": "node scripts/pkg-css.js && webpack"
   },
   "devDependencies": {
-    "@types/node": "^16.3.1",
+    "@types/node": "^16.3.3",
     "ts-loader": "^9.2.3",
     "typescript": "^4.3.5",
-    "webpack": "^5.44.0",
+    "webpack": "^5.45.1",
     "webpack-cli": "^4.7.2"
   },
   "dependencies": {
-    "@ddu6/stui": "^0.0.12"
+    "@ddu6/stui": "^0.0.13"
   }
 }
