@@ -1,5 +1,6 @@
 import { Shell, Div, Checkbox, NumberBar, TimeBar } from '@ddu6/stui'
-import {all} from './lib/css'
+import {all as allIcons} from './lib/icons'
+import {all as allCSS} from './lib/css'
 export class Player extends Shell{
     readonly videoEle=document.createElement('video')
     readonly toolBar=new Div(['tool bar'])
@@ -12,7 +13,7 @@ export class Player extends Shell{
         play:new Checkbox('play')
     }
     constructor(){
-        super('Player','',all,['player'])
+        super('Player','',allIcons+allCSS,['player'])
         this
         .append(this.videoEle)
         .append(
@@ -81,6 +82,34 @@ export class Player extends Shell{
         })
         this.videoEle.addEventListener('click',()=>{
             this.toolBar.classList.toggle('hide')
+        })
+        addEventListener('keydown',e=>{
+            if(e.key===' '){
+                this.checkboxes.play.element.click()
+                return
+            }
+            if(e.key==='ArrowLeft'){
+                this.videoEle.currentTime-=10
+                return
+            }
+            if(e.key==='ArrowRight'){
+                this.videoEle.currentTime+=10
+                return
+            }
+            if(e.key==='['){
+                const val=this.videoEle.playbackRate-0.1
+                if(val>=0.2){
+                    this.videoEle.playbackRate=val
+                }
+                return
+            }
+            if(e.key===']'){
+                const val=this.videoEle.playbackRate+0.1
+                if(val<=5){
+                    this.videoEle.playbackRate=val
+                }
+                return
+            }
         })
     }
 }
