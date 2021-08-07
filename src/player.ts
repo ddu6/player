@@ -97,17 +97,11 @@ export class Player extends Shell{
                 return
             }
             if(e.key==='['){
-                const val=this.videoEle.playbackRate-0.1
-                if(val>=0.2){
-                    this.videoEle.playbackRate=val
-                }
+                this.videoEle.playbackRate=Math.max(0.2,this.videoEle.playbackRate-0.1)
                 return
             }
             if(e.key===']'){
-                const val=this.videoEle.playbackRate+0.1
-                if(val<=5){
-                    this.videoEle.playbackRate=val
-                }
+                this.videoEle.playbackRate=Math.min(5,this.videoEle.playbackRate+0.1)
                 return
             }
         })
