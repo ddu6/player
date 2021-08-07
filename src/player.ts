@@ -60,7 +60,7 @@ export class Player extends Shell{
             this.checkboxes.play.classList.remove('checking')
         })
         this.videoEle.addEventListener('loadedmetadata',()=>{
-            this.bars.time.setDuration(this.videoEle.duration)
+            this.bars.time.setMax(this.videoEle.duration)
         })
         this.videoEle.addEventListener('play',()=>{
             this.checkboxes.play.classList.remove('play')
