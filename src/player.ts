@@ -31,7 +31,7 @@ export class Player extends Shell{
         )
         const params=new URLSearchParams(document.location.search)
         const src=params.get('src')??document.documentElement.dataset.src??''
-        if(src!==''){
+        if(src.length>0){
             this.videoEle.src=src
         }
         const time=Number(params.get('t')??document.documentElement.dataset.t??'')
