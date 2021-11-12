@@ -1,2 +1,4 @@
 import {Player} from './mod.js'
-window.player=new Player()
+const player=window.player=new Player()
+document.body.append(player.styleEle)
+document.body.append(player.element)
