@@ -35,9 +35,9 @@
 }
 
 .unit.player.error {
-    box-shadow: inset 1px 0 var(--color-warn);
+    box-shadow: inset 2px 1px var(--color-warn);
 }
 
 .unit.player.loading {
-    box-shadow: inset 1px 0 var(--color-string);
+    box-shadow: inset 2px 1px var(--color-string);
 }
