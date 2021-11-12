@@ -65,7 +65,13 @@ export const player = async (unit, compiler) => {
         video.currentTime = time;
     }
     bars.time.inputListeners.push(async (value) => {
-        video.currentTime = value;
+        const { seekable } = video;
+        for (let i = 0; i < seekable.length; i++) {
+            if (seekable.start(i) <= value && value <= seekable.end(i)) {
+                video.currentTime = value;
+                return;
+            }
+        }
     });
     bars.speed.inputListeners.push(async (value) => {
         video.playbackRate = value;
@@ -111,7 +117,13 @@ export const player = async (unit, compiler) => {
         checkboxes.play.classList.add('play');
         checkboxes.play.classList.remove('pause');
     });
+    let lastUpdate = 0;
     video.addEventListener('timeupdate', () => {
+        const now = Date.now();
+        if (now - lastUpdate < 1000) {
+            return;
+        }
+        lastUpdate = now;
         bars.time.setValue(video.currentTime);
     });
     video.addEventListener('ratechange', () => {
