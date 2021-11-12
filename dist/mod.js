@@ -1,104 +1,164 @@
-import { Shell, Div, Checkbox, NumberBar, TimeBar } from '@ddu6/stui';
-import { all } from './lib/css';
-export class Player extends Shell {
-    constructor() {
-        super('Player', '', all, ['player', 'hide']);
-        this.videoEle = document.createElement('video');
-        this.toolBar = new Div(['tool bar']);
-        this.bars = {
-            time: new TimeBar('time', 0),
-            speed: new NumberBar('speed', 0.2, 1, 5, true),
-            brightness: new NumberBar('brightness', 0.1, 1, 10, true)
-        };
-        this.checkboxes = {
-            play: new Checkbox('play')
-        };
-        this
-            .append(this.videoEle)
-            .append(this.toolBar
-            .append(new Div()
-            .append(this.checkboxes.play)
-            .append(this.bars.time))
-            .append(new Div()
-            .append(this.bars.speed)
-            .append(this.bars.brightness)));
-        const params = new URLSearchParams(document.location.search);
-        const src = params.get('src') ?? document.documentElement.dataset.src ?? '';
-        if (src.length > 0) {
-            this.videoEle.src = src;
+import { Div, Checkbox, NumberBar, TimeBar } from '@ddu6/stui';
+const players = [];
+export function show() {
+    for (const { element } of players) {
+        const { top, height } = element.getBoundingClientRect();
+        const mid = top + height / 2;
+        if (mid >= 0 && mid <= window.visualViewport.height) {
+            document.documentElement.classList.add('showing');
+            element.scrollIntoView();
+            return;
         }
-        const time = Number(params.get('t') ?? document.documentElement.dataset.t ?? '');
-        if (time > 0) {
-            this.videoEle.currentTime = time;
+    }
+}
+export function exit() {
+    document.documentElement.classList.remove('showing');
+}
+export function listen(full = false) {
+    addEventListener('keydown', async (e) => {
+        if (full && e.key === 'Enter') {
+            show();
+            return;
         }
-        this.bars.time.inputListeners.push(async (value) => {
-            this.videoEle.currentTime = value;
-        });
-        this.bars.speed.inputListeners.push(async (value) => {
-            this.videoEle.playbackRate = value;
-        });
-        this.bars.brightness.inputListeners.push(async (value) => {
-            this.videoEle.style.filter = `brightness(${value})`;
-        });
-        this.checkboxes.play.addEventListener('click', async () => {
-            if (this.checkboxes.play.classList.contains('checking')) {
+        if (full && e.key === 'Escape') {
+            exit();
+            return;
+        }
+        for (const { element, listener } of players) {
+            const { top, height } = element.getBoundingClientRect();
+            const mid = top + height / 2;
+            if (mid >= 0 && mid <= window.visualViewport.height) {
+                await listener(e);
                 return;
             }
-            this.checkboxes.play.classList.add('checking');
-            if (this.checkboxes.play.classList.contains('play')) {
-                await this.videoEle.play();
-            }
-            else {
-                this.videoEle.pause();
-            }
-            this.checkboxes.play.classList.remove('checking');
-        });
-        this.videoEle.addEventListener('loadedmetadata', () => {
-            this.bars.time.setMax(this.videoEle.duration);
-            this.classList.remove('hide');
-        });
-        this.videoEle.addEventListener('play', () => {
-            this.checkboxes.play.classList.remove('play');
-            this.checkboxes.play.classList.add('pause');
-        });
-        this.videoEle.addEventListener('pause', () => {
-            this.checkboxes.play.classList.add('play');
-            this.checkboxes.play.classList.remove('pause');
-        });
-        this.videoEle.addEventListener('ended', () => {
-            this.checkboxes.play.classList.add('play');
-            this.checkboxes.play.classList.remove('pause');
-        });
-        this.videoEle.addEventListener('timeupdate', () => {
-            this.bars.time.setValue(this.videoEle.currentTime);
-        });
-        this.videoEle.addEventListener('ratechange', () => {
-            this.bars.speed.setValue(this.videoEle.playbackRate);
-        });
-        this.videoEle.addEventListener('click', () => {
-            this.toolBar.classList.toggle('hide');
-        });
-        addEventListener('keydown', e => {
+        }
+    });
+}
+export const player = async (unit, compiler) => {
+    const element = new Div();
+    const video = document.createElement('video');
+    const toolBar = new Div(['tool bar']);
+    const bars = {
+        time: new TimeBar('time', 0),
+        speed: new NumberBar('speed', 0.2, 1, 5, true),
+        brightness: new NumberBar('brightness', 0.1, 1, 10, true)
+    };
+    const checkboxes = {
+        play: new Checkbox('play')
+    };
+    element
+        .append(video)
+        .append(toolBar
+        .append(new Div()
+        .append(checkboxes.play)
+        .append(bars.time))
+        .append(new Div()
+        .append(bars.speed)
+        .append(bars.brightness)));
+    const params = new URLSearchParams(document.location.search);
+    const src = unit.options.src ?? params.get('player-src') ?? document.documentElement.dataset.playerSrc ?? '';
+    if (typeof src === 'string' && src.length > 0) {
+        video.src = src;
+    }
+    const time = Number(unit.options.time ?? params.get('player-time') ?? document.documentElement.dataset.playerTime ?? '');
+    if (time > 0) {
+        video.currentTime = time;
+    }
+    bars.time.inputListeners.push(async (value) => {
+        video.currentTime = value;
+    });
+    bars.speed.inputListeners.push(async (value) => {
+        video.playbackRate = value;
+    });
+    bars.brightness.inputListeners.push(async (value) => {
+        video.style.filter = `brightness(${value})`;
+    });
+    checkboxes.play.addEventListener('click', async () => {
+        if (checkboxes.play.classList.contains('checking')) {
+            return;
+        }
+        checkboxes.play.classList.add('checking');
+        if (checkboxes.play.classList.contains('play')) {
+            await video.play();
+        }
+        else {
+            video.pause();
+        }
+        checkboxes.play.classList.remove('checking');
+    });
+    video.addEventListener('loadedmetadata', () => {
+        bars.time.setMax(video.duration);
+        element.classList.remove('loading');
+    });
+    video.addEventListener('playing', () => {
+        element.classList.remove('loading');
+    });
+    video.addEventListener('waiting', () => {
+        element.classList.add('loading');
+    });
+    video.addEventListener('error', () => {
+        element.classList.add('error');
+    });
+    video.addEventListener('play', () => {
+        checkboxes.play.classList.remove('play');
+        checkboxes.play.classList.add('pause');
+    });
+    video.addEventListener('pause', () => {
+        checkboxes.play.classList.add('play');
+        checkboxes.play.classList.remove('pause');
+    });
+    video.addEventListener('ended', () => {
+        checkboxes.play.classList.add('play');
+        checkboxes.play.classList.remove('pause');
+    });
+    video.addEventListener('timeupdate', () => {
+        bars.time.setValue(video.currentTime);
+    });
+    video.addEventListener('ratechange', () => {
+        bars.speed.setValue(video.playbackRate);
+    });
+    video.addEventListener('click', () => {
+        toolBar.classList.toggle('hide');
+    });
+    players.push({
+        element: video,
+        listener: async (e) => {
             if (e.key === ' ') {
-                this.checkboxes.play.element.click();
+                e.preventDefault();
+                checkboxes.play.element.click();
                 return;
             }
             if (e.key === 'ArrowLeft') {
-                this.videoEle.currentTime -= 10;
+                e.preventDefault();
+                video.currentTime -= 10;
                 return;
             }
             if (e.key === 'ArrowRight') {
-                this.videoEle.currentTime += 10;
+                e.preventDefault();
+                video.currentTime += 10;
+                return;
+            }
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                await bars.brightness.changeValue(0.1);
+                return;
+            }
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                await bars.brightness.changeValue(-0.1);
                 return;
             }
             if (e.key === '[') {
-                this.videoEle.playbackRate = Math.max(0.2, this.videoEle.playbackRate - 0.1);
+                e.preventDefault();
+                video.playbackRate = Math.max(0.2, video.playbackRate - 0.1);
                 return;
             }
             if (e.key === ']') {
-                this.videoEle.playbackRate = Math.min(5, this.videoEle.playbackRate + 0.1);
+                e.preventDefault();
+                video.playbackRate = Math.min(5, video.playbackRate + 0.1);
                 return;
             }
-        });
-    }
-}
+        }
+    });
+    return element.element;
+};

@@ -1,14 +1,5 @@
-import { Shell, Div, Checkbox, NumberBar, TimeBar } from '@ddu6/stui';
-export declare class Player extends Shell {
-    readonly videoEle: HTMLVideoElement;
-    readonly toolBar: Div;
-    readonly bars: {
-        time: TimeBar;
-        speed: NumberBar;
-        brightness: NumberBar;
-    };
-    readonly checkboxes: {
-        play: Checkbox;
-    };
-    constructor();
-}
+import { UnitCompiler } from '@ddu6/stc';
+export declare function show(): void;
+export declare function exit(): void;
+export declare function listen(full?: boolean): void;
+export declare const player: UnitCompiler;

@@ -1,0 +1,43 @@
+@import url(icons/main.css);
+
+.unit.player {
+    position: relative;
+}
+
+.unit.player>video {
+    display: block;
+    max-height: 100vh;
+    width: 100%;
+}
+
+.unit.player>.tool-bar {
+    background: linear-gradient(to top, var(--color-bg), 75%, transparent);
+    bottom: 0;
+    left: 0;
+    padding: var(--length-gap);
+    position: absolute;
+    right: 0;
+}
+
+.unit.player>.tool-bar>div {
+    align-items: center;
+    display: flex;
+    gap: var(--length-gap);
+    justify-content: space-between;
+}
+
+.unit.player>.tool-bar>div>.number-bar {
+    flex-grow: 1;
+}
+
+.unit.player>.tool-bar>div>.number-bar.time:before {
+    display: none;
+}
+
+.unit.player.error {
+    box-shadow: inset 1px 0 var(--color-warn);
+}
+
+.unit.player.loading {
+    box-shadow: inset 1px 0 var(--color-string);
+}

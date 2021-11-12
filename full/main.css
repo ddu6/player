@@ -1,0 +1,29 @@
+@import url(../main.css);
+
+html {
+    --length-width: 100%;
+}
+
+html.showing {
+    overflow: hidden;
+}
+
+body>.lr-struct>aside:not(.active) {
+    display: none;
+}
+
+body>.lr-struct>button {
+    display: block;
+}
+
+html.showing>body>.lr-struct>button {
+    display: none;
+}
+
+body>.lr-struct>main {
+    margin-left: 0 !important;
+}
+
+body>.lr-struct>main>article {
+    padding: 0;
+}
