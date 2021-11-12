@@ -1,6 +1,5 @@
-import { Shell, Div, Checkbox, NumberBar, TimeBar } from '@ddu6/stui'
-import {all as allIcons} from './lib/icons'
-import {all as allCSS} from './lib/css'
+import {Shell,Div,Checkbox,NumberBar,TimeBar} from '@ddu6/stui'
+import {all} from './lib/css'
 export class Player extends Shell{
     readonly videoEle=document.createElement('video')
     readonly toolBar=new Div(['tool bar'])
@@ -13,7 +12,7 @@ export class Player extends Shell{
         play:new Checkbox('play')
     }
     constructor(){
-        super('Player','',allIcons+allCSS,['player'])
+        super('Player','',all,['player','hide'])
         this
         .append(this.videoEle)
         .append(
@@ -61,6 +60,7 @@ export class Player extends Shell{
         })
         this.videoEle.addEventListener('loadedmetadata',()=>{
             this.bars.time.setMax(this.videoEle.duration)
+            this.classList.remove('hide')
         })
         this.videoEle.addEventListener('play',()=>{
             this.checkboxes.play.classList.remove('play')
