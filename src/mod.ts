@@ -41,7 +41,7 @@ export function listen(full=false){
 export const player:UnitCompiler=async (unit,compiler)=>{
     const element=new Div()
     const video=document.createElement('video')
-    const toolBar=new Div(['tool bar'])
+    const toolBar=new Div(['tool bar','hide'])
     const bars={
         time:new TimeBar('time',0),
         speed:new NumberBar('speed',0.2,1,5,true),
