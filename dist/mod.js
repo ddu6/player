@@ -34,6 +34,15 @@ export function listen(full = false) {
         }
     });
 }
+const videoAttrs = [
+    'autoplay',
+    'controls',
+    'crossorigin',
+    'loop',
+    'muted',
+    'poster',
+    'preload',
+];
 export const player = async (unit, compiler) => {
     const element = new Div();
     const video = document.createElement('video');
@@ -63,6 +72,27 @@ export const player = async (unit, compiler) => {
     const time = Number(unit.options.time ?? params.get('player-time') ?? document.documentElement.dataset.playerTime ?? '');
     if (time > 0) {
         video.currentTime = time;
+    }
+    for (const key of Object.keys(unit.options)) {
+        if (key === 'src' || key === 'time') {
+            continue;
+        }
+        if (!videoAttrs.includes(key)) {
+            continue;
+        }
+        let val = unit.options[key];
+        if (val === true) {
+            val = '';
+        }
+        if (typeof val !== 'string') {
+            continue;
+        }
+        try {
+            video.setAttribute(key, val);
+        }
+        catch (err) {
+            console.log(err);
+        }
     }
     bars.time.inputListeners.push(async (value) => {
         const { seekable } = video;
@@ -172,5 +202,6 @@ export const player = async (unit, compiler) => {
             }
         }
     });
+    video.append(await compiler.compileInlineSTDN(unit.children));
     return element.element;
 };

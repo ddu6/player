@@ -34,10 +34,21 @@
     display: none;
 }
 
-.unit.player.error {
-    box-shadow: inset 2px 1px var(--color-warn);
+.unit.player.error::after,
+.unit.player.loading::after {
+    bottom: 0;
+    content: "";
+    display: block;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 2px;
 }
 
-.unit.player.loading {
-    box-shadow: inset 2px 1px var(--color-string);
+.unit.player.error::after {
+    background: var(--color-warn);
+}
+
+.unit.player.loading::after {
+    background: var(--color-string);
 }
