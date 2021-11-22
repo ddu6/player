@@ -27,3 +27,9 @@ body>.lr-struct>main {
 body>.lr-struct>main>article {
     padding: 0;
 }
+
+@media print {
+    body>.lr-struct>button {
+        display: none;
+    }
+}
