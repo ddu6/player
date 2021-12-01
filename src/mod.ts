@@ -4,7 +4,7 @@ const players:{
     element:HTMLVideoElement
     listener:(e:KeyboardEvent)=>Promise<void>
 }[]=[]
-export function show(){
+function show(){
     for(const {element} of players){
         const {top,height}=element.getBoundingClientRect()
         const mid=top+height/2
@@ -15,7 +15,7 @@ export function show(){
         }
     }
 }
-export function exit(){
+function exit(){
     document.documentElement.classList.remove('showing')
 }
 export function listen(full=false){
