@@ -1,5 +1,5 @@
 import {Div,Checkbox,NumberBar,TimeBar} from '@ddu6/stui'
-import {UnitCompiler} from '@ddu6/stc'
+import {getLastGlobalOption,UnitCompiler} from '@ddu6/stc/dist/countext'
 const players:{
     element:HTMLVideoElement
     listener:(e:KeyboardEvent)=>Promise<void>
@@ -83,14 +83,8 @@ export const player:UnitCompiler=async (unit,compiler)=>{
     if(time>0){
         video.currentTime=time
     }
-    for(const key of Object.keys(unit.options)){
-        if(key==='src'||key==='time'){
-            continue
-        }
-        if(!videoAttrs.includes(key)){
-            continue
-        }
-        let val=unit.options[key]
+    for(const key of videoAttrs){
+        let val=unit.options[key]??getLastGlobalOption(key,'player',compiler.context.tagToGlobalOptions)
         if(val===true){
             val=''
         }
