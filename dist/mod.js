@@ -108,6 +108,14 @@ export const player = async (unit, compiler) => {
             console.log(err);
         }
     }
+    timeVal.textContent = prettyTime(0);
+    speedVal.textContent = '1.0';
+    brightnessVal.textContent = '1.0';
+    function updateBrightness() {
+        const scale = rateToScale(brightnessBar.getValue(), 10);
+        video.style.filter = `brightness(${scale})`;
+        brightnessVal.textContent = scale.toFixed(1);
+    }
     video.addEventListener('click', () => {
         panel.classList.toggle('hide');
     });
@@ -138,11 +146,6 @@ export const player = async (unit, compiler) => {
     speedBar.element.addEventListener('click', () => {
         video.playbackRate = Math.exp((speedBar.getValue() - .5) * 2 * Math.log(5));
     });
-    function updateBrightness() {
-        const scale = rateToScale(brightnessBar.getValue(), 10);
-        video.style.filter = `brightness(${scale})`;
-        brightnessVal.textContent = scale.toFixed(1);
-    }
     brightnessBar.element.addEventListener('click', updateBrightness);
     video.addEventListener('loadedmetadata', () => {
         timeVal.textContent = prettyTime(video.duration);
@@ -184,44 +187,42 @@ export const player = async (unit, compiler) => {
         speedBar.setValue(scaleToRate(scale, 5));
         speedVal.textContent = scale.toFixed(1);
     });
-    if (compiler.context.root === undefined) {
-        button.addEventListener('keydown', e => {
-            if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                video.currentTime -= 10;
-                timeVal.textContent = prettyTime(video.currentTime);
-                return;
-            }
-            if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                video.currentTime += 10;
-                timeVal.textContent = prettyTime(video.currentTime);
-                return;
-            }
-            if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                brightnessBar.setValue(scaleToRate(rateToScale(brightnessBar.getValue(), 10) + .1, 10));
-                updateBrightness();
-                return;
-            }
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                brightnessBar.setValue(scaleToRate(rateToScale(brightnessBar.getValue(), 10) - .1, 10));
-                updateBrightness();
-                return;
-            }
-            if (e.key === '[') {
-                e.preventDefault();
-                video.playbackRate = Math.max(0.2, video.playbackRate - 0.1);
-                return;
-            }
-            if (e.key === ']') {
-                e.preventDefault();
-                video.playbackRate = Math.min(5, video.playbackRate + 0.1);
-                return;
-            }
-        });
-    }
+    button.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            video.currentTime -= 10;
+            timeVal.textContent = prettyTime(video.currentTime);
+            return;
+        }
+        if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            video.currentTime += 10;
+            timeVal.textContent = prettyTime(video.currentTime);
+            return;
+        }
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            brightnessBar.setValue(scaleToRate(rateToScale(brightnessBar.getValue(), 10) + .1, 10));
+            updateBrightness();
+            return;
+        }
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            brightnessBar.setValue(scaleToRate(rateToScale(brightnessBar.getValue(), 10) - .1, 10));
+            updateBrightness();
+            return;
+        }
+        if (e.key === '[') {
+            e.preventDefault();
+            video.playbackRate = Math.max(0.2, video.playbackRate - 0.1);
+            return;
+        }
+        if (e.key === ']') {
+            e.preventDefault();
+            video.playbackRate = Math.min(5, video.playbackRate + 0.1);
+            return;
+        }
+    });
     video.append(await compiler.compileInlineSTDN(unit.children));
     return element;
 };
