@@ -40,7 +40,7 @@ export function scaleToRate(scale: number, max: number) {
 }
 export function prettyTime(time: number) {
     if (!isFinite(time)) {
-        time=0
+        time = 0
     }
     const m = Math.floor((time % 3600) / 60).toString().padStart(2, '0')
     const s = Math.floor(time % 60).toString().padStart(2, '0')
