@@ -1,44 +1,53 @@
-import {Div,Checkbox,NumberBar,TimeBar} from '@ddu6/stui'
-import {getLastGlobalOption,UnitCompiler} from '@ddu6/stc/dist/countext'
-const players:{
-    element:HTMLVideoElement
-    listener:(e:KeyboardEvent)=>Promise<void>
-}[]=[]
-function show(){
-    for(const {element} of players){
-        const {top,height}=element.getBoundingClientRect()
-        const mid=top+height/2
-        if(mid>=0&&mid<=window.visualViewport.height){
-            document.documentElement.classList.add('showing')
-            element.scrollIntoView()
+import type {UnitCompiler} from '@ddu6/stc'
+export function createRateBar() {
+    const element = document.createElement('div')
+    element.classList.add('rate-bar')
+    let rate = .5
+    function render() {
+        const percent = rate * 100
+        element.style.background = `linear-gradient(to right, var(--color-variable) ${percent}%, var(--color-area) ${percent}%)`
+    }
+    function getValue() {
+        return rate
+    }
+    function setValue(value: number) {
+        if (!isFinite(value)) {
             return
         }
+        if (value < 0) {
+            value = 0
+        } else if (value > 1) {
+            value = 1
+        }
+        rate = value
+        render()
+    }
+    element.addEventListener('click', e => {
+        setValue(e.offsetX / element.offsetWidth)
+    })
+    render()
+    return {
+        element,
+        getValue,
+        setValue
     }
 }
-function exit(){
-    document.documentElement.classList.remove('showing')
+export function rateToScale(rate: number, max: number) {
+    return Math.exp((rate - .5) * 2 * Math.log(max))
 }
-export function listen(full=false){
-    addEventListener('keydown',async e=>{
-        if(full&&e.key==='Enter'){
-            show()
-            return
-        }
-        if(full&&e.key==='Escape'){
-            exit()
-            return
-        }
-        for(const {element,listener} of players){
-            const {top,height}=element.getBoundingClientRect()
-            const mid=top+height/2
-            if(mid>=0&&mid<=window.visualViewport.height){
-                await listener(e)
-                return
-            }
-        }
-    })
+export function scaleToRate(scale: number, max: number) {
+    return Math.log(scale) / Math.log(max) / 2 + .5
 }
-const videoAttrs=[
+export function prettyTime(time: number) {
+    const m = Math.floor((time % 3600) / 60).toString().padStart(2, '0')
+    const s = Math.floor(time % 60).toString().padStart(2, '0')
+    const string = m + ':' + s
+    if (time <= 3600) {
+        return string
+    }
+    return Math.floor(time / 3600).toString() + ':' + string
+}
+const videoAttrs = [
     'autoplay',
     'controls',
     'crossorigin',
@@ -47,163 +56,170 @@ const videoAttrs=[
     'poster',
     'preload',
 ]
-export const player:UnitCompiler=async (unit,compiler)=>{
-    const element=new Div()
-    const video=document.createElement('video')
-    const toolBar=new Div(['tool bar','hide'])
-    const bars={
-        time:new TimeBar('time',0),
-        speed:new NumberBar('speed',0.2,1,5,true),
-        brightness:new NumberBar('brightness',0.1,1,10,true)
+export const player: UnitCompiler = async (unit, compiler) => {
+    const element = document.createElement('div')
+    const video = document.createElement('video')
+    const panel = document.createElement('div')
+    const first = document.createElement('div')
+    const second = document.createElement('div')
+    const button = document.createElement('button')
+    const timeBar = createRateBar()
+    const timeVal = document.createElement('div')
+    const speedBar = createRateBar()
+    const speedVal = document.createElement('div')
+    const brightnessBar = createRateBar()
+    const brightnessVal = document.createElement('div')
+    element.append(video)
+    element.append(panel)
+    panel.append(first)
+    panel.append(second)
+    first.append(button)
+    first.append(timeBar.element)
+    first.append(timeVal)
+    second.append(new Text('Speed'))
+    second.append(speedBar.element)
+    second.append(speedVal)
+    second.append(new Text('Brightness'))
+    second.append(brightnessBar.element)
+    second.append(brightnessVal)
+    panel.classList.add('hide')
+    button.classList.add('show-icon')
+    button.classList.add('play')
+    timeBar.setValue(0)
+    const {src, time} = unit.options
+    if (typeof src === 'string') {
+        video.src = src
     }
-    const checkboxes={
-        play:new Checkbox('play')
+    if (typeof time === 'number' && isFinite(time) && time > 0) {
+        video.currentTime = time
     }
-    element
-    .append(video)
-    .append(
-        toolBar
-        .append(
-            new Div()
-            .append(checkboxes.play)
-            .append(bars.time)
-        )
-        .append(
-            new Div()
-            .append(bars.speed)
-            .append(bars.brightness)
-        )
-    )
-    const params=new URLSearchParams(document.location.search)
-    const src=unit.options.src??params.get('player-src')??document.documentElement.dataset.playerSrc??''
-    if(typeof src==='string'&&src.length>0){
-        video.src=src
-    }
-    const time=Number(unit.options.time??params.get('player-time')??document.documentElement.dataset.playerTime??'')
-    if(time>0){
-        video.currentTime=time
-    }
-    for(const key of videoAttrs){
-        let val=unit.options[key]??getLastGlobalOption(key,'player',compiler.context.tagToGlobalOptions)
-        if(val===true){
-            val=''
+    for (const key of videoAttrs) {
+        let val = unit.options[key] ?? compiler.extractor.extractLastGlobalOption(key, 'player', compiler.context.tagToGlobalOptions)
+        if (val === true) {
+            val = ''
         }
-        if(typeof val!=='string'){
+        if (typeof val !== 'string') {
             continue
         }
-        try{
-            video.setAttribute(key,val)
-        }catch(err){
+        try {
+            video.setAttribute(key, val)
+        } catch (err) {
             console.log(err)
         }
     }
-    bars.time.inputListeners.push(async value=>{
-        const {seekable}=video
-        for(let i=0;i<seekable.length;i++){
-            if(seekable.start(i)<=value&&value<=seekable.end(i)){
-                video.currentTime=value
-                return
-            }
-        }
+    video.addEventListener('click', () => {
+        panel.classList.toggle('hide')
     })
-    bars.speed.inputListeners.push(async value=>{
-        video.playbackRate=value
-    })
-    bars.brightness.inputListeners.push(async value=>{
-        video.style.filter=`brightness(${value})`
-    })
-    checkboxes.play.addEventListener('click',async ()=>{
-        if(checkboxes.play.classList.contains('checking')){
+    button.addEventListener('click', async () => {
+        if (button.classList.contains('pushing')) {
             return
         }
-        checkboxes.play.classList.add('checking')
-        if(checkboxes.play.classList.contains('play')){
+        button.classList.add('pushing')
+        if (button.classList.contains('play')) {
             await video.play()
-        }else{
+        } else {
             video.pause()
         }
-        checkboxes.play.classList.remove('checking')
+        button.classList.remove('pushing')
     })
-    video.addEventListener('loadedmetadata',()=>{
-        bars.time.setMax(video.duration)
+    timeBar.element.addEventListener('click', () => {
+        const value = timeBar.getValue() * video.duration
+        const {seekable} = video
+        for (let i = 0; i < seekable.length; i++) {
+            if (seekable.start(i) <= value && value <= seekable.end(i)) {
+                video.currentTime = value
+                timeVal.textContent = prettyTime(video.currentTime)
+                return
+            }
+        }
+    })
+    speedBar.element.addEventListener('click', () => {
+        video.playbackRate = Math.exp((speedBar.getValue() - .5) * 2 * Math.log(5))
+    })
+    function updateBrightness() {
+        const scale = rateToScale(brightnessBar.getValue(), 10)
+        video.style.filter = `brightness(${scale})`
+        brightnessVal.textContent = scale.toFixed(1)
+    }
+    brightnessBar.element.addEventListener('click', updateBrightness)
+    video.addEventListener('loadedmetadata', () => {
+        timeVal.textContent = prettyTime(video.duration)
         element.classList.remove('loading')
     })
-    video.addEventListener('playing',()=>{
+    video.addEventListener('playing', () => {
         element.classList.remove('loading')
     })
-    video.addEventListener('waiting',()=>{
+    video.addEventListener('waiting', () => {
         element.classList.add('loading')
     })
-    video.addEventListener('error',()=>{
+    video.addEventListener('error', () => {
         element.classList.add('error')
     })
-    video.addEventListener('play',()=>{
-        checkboxes.play.classList.remove('play')
-        checkboxes.play.classList.add('pause')
+    video.addEventListener('play', () => {
+        button.classList.remove('play')
+        button.classList.add('pause')
     })
-    video.addEventListener('pause',()=>{
-        checkboxes.play.classList.add('play')
-        checkboxes.play.classList.remove('pause')
+    video.addEventListener('pause', () => {
+        button.classList.add('play')
+        button.classList.remove('pause')
     })
-    video.addEventListener('ended',()=>{
-        checkboxes.play.classList.add('play')
-        checkboxes.play.classList.remove('pause')
+    video.addEventListener('ended', () => {
+        button.classList.add('play')
+        button.classList.remove('pause')
     })
-    let lastUpdate=0
-    video.addEventListener('timeupdate',()=>{
-        const now=Date.now()
-        if(now-lastUpdate<1000){
+    let lastUpdate = 0
+    video.addEventListener('timeupdate', () => {
+        const now = Date.now()
+        if (now - lastUpdate < 500) {
             return
         }
-        lastUpdate=now
-        bars.time.setValue(video.currentTime)
+        lastUpdate = now
+        timeBar.setValue(video.currentTime / video.duration)
+        timeVal.textContent = prettyTime(video.currentTime)
     })
-    video.addEventListener('ratechange',()=>{
-        bars.speed.setValue(video.playbackRate)
+    video.addEventListener('ratechange', () => {
+        const scale = video.playbackRate
+        speedBar.setValue(scaleToRate(scale, 5))
+        speedVal.textContent = scale.toFixed(1)
     })
-    video.addEventListener('click',()=>{
-        toolBar.classList.toggle('hide')
-    })
-    players.push({
-        element:video,
-        listener:async e=>{
-            if(e.key===' '){
+    if (compiler.context.root === undefined) {
+        button.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft') {
                 e.preventDefault()
-                checkboxes.play.element.click()
+                video.currentTime -= 10
+                timeVal.textContent = prettyTime(video.currentTime)
                 return
             }
-            if(e.key==='ArrowLeft'){
+            if (e.key === 'ArrowRight') {
                 e.preventDefault()
-                video.currentTime-=10
+                video.currentTime += 10
+                timeVal.textContent = prettyTime(video.currentTime)
                 return
             }
-            if(e.key==='ArrowRight'){
+            if (e.key === 'ArrowUp') {
                 e.preventDefault()
-                video.currentTime+=10
+                brightnessBar.setValue(scaleToRate(rateToScale(brightnessBar.getValue(), 10) + .1, 10))
+                updateBrightness()
                 return
             }
-            if(e.key==='ArrowUp'){
+            if (e.key === 'ArrowDown') {
                 e.preventDefault()
-                await bars.brightness.changeValue(0.1)
+                brightnessBar.setValue(scaleToRate(rateToScale(brightnessBar.getValue(), 10) - .1, 10))
+                updateBrightness()
                 return
             }
-            if(e.key==='ArrowDown'){
+            if (e.key === '[') {
                 e.preventDefault()
-                await bars.brightness.changeValue(-0.1)
+                video.playbackRate = Math.max(0.2, video.playbackRate - 0.1)
                 return
             }
-            if(e.key==='['){
+            if (e.key === ']') {
                 e.preventDefault()
-                video.playbackRate=Math.max(0.2,video.playbackRate-0.1)
+                video.playbackRate = Math.min(5, video.playbackRate + 0.1)
                 return
             }
-            if(e.key===']'){
-                e.preventDefault()
-                video.playbackRate=Math.min(5,video.playbackRate+0.1)
-                return
-            }
-        }
-    })
+        })
+    }
     video.append(await compiler.compileInlineSTDN(unit.children))
-    return element.element
+    return element
 }

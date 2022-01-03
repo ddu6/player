@@ -1,6 +1,6 @@
-{css-src full/main.css, ucs-src full/ucs.js, global []}
+{css-src main.css, ucs-src ucs.js, global []}
 {global, crossorigin, player []}
-{src https://api.dogecloud.com/player/get.mp4?vcode=5ac682e6f8231991&userId=17&ext=.mp4, player []}
+{src https://api.dogecloud.com/player/get.mp4?vcode=5ac682e6f8231991&userId=17&ext=.mp4, time 10, player []}
 []
 {src friday.mp4, player [
     //

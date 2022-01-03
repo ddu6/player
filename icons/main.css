@@ -1,3 +1,2 @@
-@font-face{font-family:"main";src:url(main.css)}.show-icon.main::before{font-family:"main";content:"A"}
-@font-face{font-family:"pause";src:url(pause.woff)}.show-icon.pause::before{font-family:"pause";content:"A"}
-@font-face{font-family:"play";src:url(play.woff)}.show-icon.play::before{font-family:"play";content:"A"}
+@font-face{font-family:pause;src:url(pause.woff)}.show-icon.pause::before{font-family:pause;content:"A"}
+@font-face{font-family:play;src:url(play.woff)}.show-icon.play::before{font-family:play;content:"A"}
