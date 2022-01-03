@@ -40,7 +40,7 @@ export function scaleToRate(scale: number, max: number) {
 }
 export function prettyTime(time: number) {
     if (!isFinite(time)) {
-        return '00:00'
+        time=0
     }
     const m = Math.floor((time % 3600) / 60).toString().padStart(2, '0')
     const s = Math.floor(time % 60).toString().padStart(2, '0')
@@ -97,7 +97,7 @@ export const player: UnitCompiler = async (unit, compiler) => {
         for (let i = 0; i < seekable.length; i++) {
             if (seekable.start(i) <= value && value <= seekable.end(i)) {
                 video.currentTime = value
-                timeVal.textContent = prettyTime(video.currentTime)
+                timeVal.textContent = `${prettyTime(video.currentTime)}/${prettyTime(video.duration)}`
                 return
             }
         }
@@ -151,7 +151,7 @@ export const player: UnitCompiler = async (unit, compiler) => {
     })
     brightnessBar.element.addEventListener('click', updateBrightness)
     video.addEventListener('loadedmetadata', () => {
-        timeVal.textContent = prettyTime(video.duration)
+        timeVal.textContent = `${prettyTime(video.currentTime)}/${prettyTime(video.duration)}`
         element.classList.remove('loading')
     })
     video.addEventListener('playing', () => {
