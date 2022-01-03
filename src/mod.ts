@@ -89,7 +89,7 @@ export const player: UnitCompiler = async (unit, compiler) => {
     button.classList.add('show-icon')
     button.classList.add('play')
     timeBar.setValue(0)
-    timeVal.textContent = prettyTime(0)
+    timeVal.textContent = `${prettyTime(0)}/${prettyTime(0)}`
     speedVal.textContent = '1.0'
     brightnessVal.textContent = '1.0'
     function setCurrentTime(value: number) {
