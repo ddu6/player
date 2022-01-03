@@ -39,6 +39,9 @@ export function scaleToRate(scale: number, max: number) {
     return Math.log(scale) / Math.log(max) / 2 + .5
 }
 export function prettyTime(time: number) {
+    if (!isFinite(time)) {
+        return '00:00'
+    }
     const m = Math.floor((time % 3600) / 60).toString().padStart(2, '0')
     const s = Math.floor(time % 60).toString().padStart(2, '0')
     const string = m + ':' + s
@@ -86,12 +89,25 @@ export const player: UnitCompiler = async (unit, compiler) => {
     button.classList.add('show-icon')
     button.classList.add('play')
     timeBar.setValue(0)
+    timeVal.textContent = prettyTime(0)
+    speedVal.textContent = '1.0'
+    brightnessVal.textContent = '1.0'
+    function setCurrentTime(value: number) {
+        const {seekable} = video
+        for (let i = 0; i < seekable.length; i++) {
+            if (seekable.start(i) <= value && value <= seekable.end(i)) {
+                video.currentTime = value
+                timeVal.textContent = prettyTime(video.currentTime)
+                return
+            }
+        }
+    }
     const {src, time} = unit.options
     if (typeof src === 'string') {
         video.src = src
     }
     if (typeof time === 'number' && isFinite(time) && time > 0) {
-        video.currentTime = time
+        setCurrentTime(time)
     }
     for (const key of videoAttrs) {
         let val = unit.options[key] ?? compiler.extractor.extractLastGlobalOption(key, 'player', compiler.context.tagToGlobalOptions)
@@ -107,9 +123,6 @@ export const player: UnitCompiler = async (unit, compiler) => {
             console.log(err)
         }
     }
-    timeVal.textContent = prettyTime(0)
-    speedVal.textContent = '1.0'
-    brightnessVal.textContent = '1.0'
     function updateBrightness() {
         const scale = rateToScale(brightnessBar.getValue(), 10)
         video.style.filter = `brightness(${scale})`
@@ -131,15 +144,7 @@ export const player: UnitCompiler = async (unit, compiler) => {
         button.classList.remove('pushing')
     })
     timeBar.element.addEventListener('click', () => {
-        const value = timeBar.getValue() * video.duration
-        const {seekable} = video
-        for (let i = 0; i < seekable.length; i++) {
-            if (seekable.start(i) <= value && value <= seekable.end(i)) {
-                video.currentTime = value
-                timeVal.textContent = prettyTime(video.currentTime)
-                return
-            }
-        }
+        setCurrentTime(timeBar.getValue() * video.duration)
     })
     speedBar.element.addEventListener('click', () => {
         video.playbackRate = Math.exp((speedBar.getValue() - .5) * 2 * Math.log(5))
@@ -178,7 +183,7 @@ export const player: UnitCompiler = async (unit, compiler) => {
         }
         lastUpdate = now
         timeBar.setValue(video.currentTime / video.duration)
-        timeVal.textContent = prettyTime(video.currentTime)
+        timeVal.textContent = `${prettyTime(video.currentTime)}/${prettyTime(video.duration)}`
     })
     video.addEventListener('ratechange', () => {
         const scale = video.playbackRate
@@ -188,14 +193,12 @@ export const player: UnitCompiler = async (unit, compiler) => {
     button.addEventListener('keydown', e => {
         if (e.key === 'ArrowLeft') {
             e.preventDefault()
-            video.currentTime -= 10
-            timeVal.textContent = prettyTime(video.currentTime)
+            setCurrentTime(video.currentTime - 10)
             return
         }
         if (e.key === 'ArrowRight') {
             e.preventDefault()
-            video.currentTime += 10
-            timeVal.textContent = prettyTime(video.currentTime)
+            setCurrentTime(video.currentTime + 10)
             return
         }
         if (e.key === 'ArrowUp') {
