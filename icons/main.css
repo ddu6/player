@@ -1,2 +1,19 @@
-@font-face{font-family:pause;src:url(pause.woff)}.show-icon.pause::before{font-family:pause;content:"A"}
-@font-face{font-family:play;src:url(play.woff)}.show-icon.play::before{font-family:play;content:"A"}
+@font-face {
+    font-family: pause;
+    src: url(pause.woff);
+}
+
+.show-icon.pause::before {
+    font-family: pause;
+    content: "A";
+}
+
+@font-face {
+    font-family: play;
+    src: url(play.woff);
+}
+
+.show-icon.play::before {
+    font-family: play;
+    content: "A";
+}
