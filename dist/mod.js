@@ -104,7 +104,7 @@ export const player = async (unit, compiler) => {
     }
     const { src, time } = unit.options;
     if (typeof src === 'string') {
-        video.src = src;
+        video.src = new URL(src, compiler.context.dir).href;
     }
     if (typeof time === 'number' && isFinite(time) && time > 0) {
         setCurrentTime(time);
