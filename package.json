@@ -1,6 +1,6 @@
 {
   "name": "@ddu6/player",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "A stdn module for creating video players",
   "main": "dist/mod.js",
   "scripts": {
