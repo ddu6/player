@@ -5,7 +5,7 @@ export function createRateBar() {
     let rate = .5
     function render() {
         const percent = rate * 100
-        element.style.background = `linear-gradient(to right, var(--color-variable) ${percent}%, var(--color-area) ${percent}%)`
+        element.style.background = `linear-gradient(to right, var(--color-variable) ${percent}%, var(--color-pre) ${percent}%)`
     }
     function getValue() {
         return rate
