@@ -178,7 +178,7 @@ export const player: UnitCompiler = async (unit, compiler) => {
     let lastUpdate = 0
     video.addEventListener('timeupdate', () => {
         const now = Date.now()
-        if (now - lastUpdate < 500) {
+        if (now - lastUpdate < 500 && video.currentTime !== video.duration) {
             return
         }
         lastUpdate = now
