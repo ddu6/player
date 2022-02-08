@@ -3,8 +3,7 @@ export function createRateBar() {
     element.classList.add('rate-bar');
     let rate = .5;
     function render() {
-        const percent = rate * 100;
-        element.style.background = `linear-gradient(to right, var(--color-variable) ${percent}%, var(--color-pre) ${percent}%)`;
+        element.style.setProperty('--rate', rate.toString());
     }
     function getValue() {
         return rate;
@@ -126,7 +125,7 @@ export const player = async (unit, compiler) => {
     }
     function updateBrightness() {
         const scale = rateToScale(brightnessBar.getValue(), 10);
-        video.style.filter = `brightness(${scale})`;
+        video.style.setProperty('--brightness', scale.toString());
         brightnessVal.textContent = scale.toFixed(1);
     }
     video.addEventListener('click', () => {

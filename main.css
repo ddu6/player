@@ -1,11 +1,16 @@
 @import url(icons/main.css);
 
+.rate-bar {
+    background: linear-gradient(to right, var(--color-variable) calc(100% * var(--rate)), var(--color-pre) calc(100% * var(--rate)));
+}
+
 .unit.player {
     position: relative;
 }
 
 .unit.player>video {
     display: block;
+    filter: brightness(var(--brightness));
     max-height: 100vh;
     width: 100%;
 }
