@@ -109,7 +109,7 @@ export const player = async (unit, compiler) => {
         setCurrentTime(time);
     }
     for (const key of videoAttrs) {
-        let val = unit.options[key] ?? compiler.extractor.extractLastGlobalOption(key, 'player', compiler.context.tagToGlobalOptions);
+        let val = unit.options[key] ?? compiler.context.extractLastGlobalOption(key, 'player');
         if (val === true) {
             val = '';
         }
