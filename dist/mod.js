@@ -1,14 +1,20 @@
-export function createRateBar() {
-    const element = document.createElement('div');
-    element.classList.add('rate-bar');
-    let rate = .5;
-    function render() {
-        element.style.setProperty('--rate', rate.toString());
+export class RateBar {
+    constructor() {
+        this.element = document.createElement('div');
+        this.rate = .5;
+        this.element.classList.add('rate-bar');
+        this.element.addEventListener('click', e => {
+            this.setValue(e.offsetX / this.element.offsetWidth);
+        });
+        this.render();
     }
-    function getValue() {
-        return rate;
+    render() {
+        this.element.style.setProperty('--rate', this.rate.toString());
     }
-    function setValue(value) {
+    getValue() {
+        return this.rate;
+    }
+    setValue(value) {
         if (!isFinite(value)) {
             return;
         }
@@ -18,18 +24,9 @@ export function createRateBar() {
         else if (value > 1) {
             value = 1;
         }
-        rate = value;
-        render();
+        this.rate = value;
+        this.render();
     }
-    element.addEventListener('click', e => {
-        setValue(e.offsetX / element.offsetWidth);
-    });
-    render();
-    return {
-        element,
-        getValue,
-        setValue
-    };
 }
 export function rateToScale(rate, max) {
     return Math.exp((rate - .5) * 2 * Math.log(max));
@@ -65,11 +62,11 @@ export const player = async (unit, compiler) => {
     const first = document.createElement('div');
     const second = document.createElement('div');
     const button = document.createElement('button');
-    const timeBar = createRateBar();
+    const timeBar = new RateBar();
     const timeVal = document.createElement('div');
-    const speedBar = createRateBar();
+    const speedBar = new RateBar();
     const speedVal = document.createElement('div');
-    const brightnessBar = createRateBar();
+    const brightnessBar = new RateBar();
     const brightnessVal = document.createElement('div');
     element.append(video);
     element.append(panel);

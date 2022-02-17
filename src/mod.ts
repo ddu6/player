@@ -1,15 +1,21 @@
 import type {UnitCompiler} from '@ddu6/stc'
-export function createRateBar() {
-    const element = document.createElement('div')
-    element.classList.add('rate-bar')
-    let rate = .5
-    function render() {
-        element.style.setProperty('--rate', rate.toString())
+export class RateBar {
+    readonly element = document.createElement('div')
+    rate = .5
+    constructor() {
+        this.element.classList.add('rate-bar')
+        this.element.addEventListener('click', e => {
+            this.setValue(e.offsetX / this.element.offsetWidth)
+        })
+        this.render()
     }
-    function getValue() {
-        return rate
+    render() {
+        this.element.style.setProperty('--rate', this.rate.toString())
     }
-    function setValue(value: number) {
+    getValue() {
+        return this.rate
+    }
+    setValue(value: number) {
         if (!isFinite(value)) {
             return
         }
@@ -18,17 +24,8 @@ export function createRateBar() {
         } else if (value > 1) {
             value = 1
         }
-        rate = value
-        render()
-    }
-    element.addEventListener('click', e => {
-        setValue(e.offsetX / element.offsetWidth)
-    })
-    render()
-    return {
-        element,
-        getValue,
-        setValue
+        this.rate = value
+        this.render()
     }
 }
 export function rateToScale(rate: number, max: number) {
@@ -65,11 +62,11 @@ export const player: UnitCompiler = async (unit, compiler) => {
     const first = document.createElement('div')
     const second = document.createElement('div')
     const button = document.createElement('button')
-    const timeBar = createRateBar()
+    const timeBar = new RateBar()
     const timeVal = document.createElement('div')
-    const speedBar = createRateBar()
+    const speedBar = new RateBar()
     const speedVal = document.createElement('div')
-    const brightnessBar = createRateBar()
+    const brightnessBar = new RateBar()
     const brightnessVal = document.createElement('div')
     element.append(video)
     element.append(panel)
