@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 export class RateBar {
     constructor() {
         this.element = document.createElement('div');
@@ -55,7 +64,8 @@ const videoAttrs = [
     'poster',
     'preload',
 ];
-export const player = async (unit, compiler) => {
+export const player = (unit, compiler) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const element = document.createElement('div');
     const video = document.createElement('video');
     const panel = document.createElement('div');
@@ -106,7 +116,7 @@ export const player = async (unit, compiler) => {
         setCurrentTime(time);
     }
     for (const key of videoAttrs) {
-        let val = unit.options[key] ?? compiler.context.extractLastGlobalOption(key, 'player');
+        let val = (_a = unit.options[key]) !== null && _a !== void 0 ? _a : compiler.context.extractLastGlobalOption(key, 'player');
         if (val === true) {
             val = '';
         }
@@ -128,19 +138,19 @@ export const player = async (unit, compiler) => {
     video.addEventListener('click', () => {
         panel.classList.toggle('hide');
     });
-    button.addEventListener('click', async () => {
+    button.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
         if (button.classList.contains('pushing')) {
             return;
         }
         button.classList.add('pushing');
         if (button.classList.contains('play')) {
-            await video.play();
+            yield video.play();
         }
         else {
             video.pause();
         }
         button.classList.remove('pushing');
-    });
+    }));
     timeBar.element.addEventListener('click', () => {
         setCurrentTime(timeBar.getValue() * video.duration);
     });
@@ -222,6 +232,6 @@ export const player = async (unit, compiler) => {
             return;
         }
     });
-    video.append(await compiler.compileInlineSTDN(unit.children));
+    video.append(yield compiler.compileInlineSTDN(unit.children));
     return element;
-};
+});
